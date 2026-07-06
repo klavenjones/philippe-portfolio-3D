@@ -31,8 +31,8 @@ export const BIO_TEXT =
 export const CATEGORY_LABELS: Record<Category, string> = {
   intro: "About the Artist",
   oils: "Oils",
-  "food-and-shoes": "Food and Shoes",
-  drawings: "Drawings and Sketches",
+  "food-and-shoes": "Food & Shoes",
+  drawings: "Drawings & Sketches",
 };
 
 export const ARTWORKS: Artwork[] = [
@@ -197,8 +197,8 @@ export const ARTWORKS: Artwork[] = [
 /** Sections that get an in-world wall label above their first artwork. */
 export const SECTIONS: { category: Category; label: string; firstSlot: number }[] = [
   { category: "oils", label: "Oils", firstSlot: 1 },
-  { category: "food-and-shoes", label: "Food and Shoes", firstSlot: 2 },
-  { category: "drawings", label: "Drawings and Sketches", firstSlot: 3 },
+  { category: "food-and-shoes", label: "Food & Shoes", firstSlot: 2 },
+  { category: "drawings", label: "Drawings & Sketches", firstSlot: 3 },
 ];
 
 export const artworkById = (id: string): Artwork | undefined =>

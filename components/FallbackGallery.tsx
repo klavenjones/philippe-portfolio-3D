@@ -37,7 +37,7 @@ export default function FallbackGallery() {
 
       {ORDER.map((category) => (
         <section key={category} className="mb-12">
-          <h2 className="mb-6 font-serif text-xl">{CATEGORY_LABELS[category]}</h2>
+          {/* <h2 className="mb-6 font-serif text-xl">{CATEGORY_LABELS[category]}</h2> */}
           <ul className="grid grid-cols-2 gap-6 sm:grid-cols-3">
             {ARTWORKS.filter((a) => a.category === category).map((a) => (
               <li key={a.id}>
