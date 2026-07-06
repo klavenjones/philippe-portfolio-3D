@@ -203,6 +203,10 @@ export function buildFrames(
     color: COLORS.frame,
     roughness: 0.6,
   });
+  const drawingFrameMat = new THREE.MeshStandardMaterial({
+    color: COLORS.drawingFrame,
+    roughness: 0.6,
+  });
   const matMat = new THREE.MeshStandardMaterial({
     color: COLORS.mat,
     roughness: 0.9,
@@ -215,7 +219,7 @@ export function buildFrames(
     const { group, artPlane } = buildFramedArtwork(
       artwork,
       loader,
-      frameMat,
+      artwork.category === "drawings" ? drawingFrameMat : frameMat,
       matMat,
       maxAnisotropy,
     );

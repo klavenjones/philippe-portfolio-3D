@@ -45,8 +45,9 @@ export const COLORS = {
   floor: 0xc9b18a,
   ceiling: 0xffffff,
   frame: 0x3d2b1f, // dark walnut
-  mat: 0xfafaf7,
+  mat: 0x333333, // light gray for drawings
   fog: 0xe8e6e1,
+  drawingFrame: 0x000000, // pure black for drawings
 } as const;
 
 export const slotZ = (slot: number) => -slot * SLOT_SPACING;
