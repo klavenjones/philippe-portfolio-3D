@@ -229,12 +229,12 @@ export function buildFrames(
   placeOnWall(bio, "left", slotZ(0) - 1.8);
   scene.add(bio);
 
-  for (const section of SECTIONS) {
-    const artwork = ARTWORKS.find((a) => a.slot === section.firstSlot)!;
-    const label = buildSectionLabel(section.label);
-    placeOnWall(label, artwork.wall, slotZ(section.firstSlot), LABEL_Y);
-    scene.add(label);
-  }
+  // for (const section of SECTIONS) {
+  //   const artwork = ARTWORKS.find((a) => a.slot === section.firstSlot)!;
+  //   const label = buildSectionLabel(section.label);
+  //   placeOnWall(label, artwork.wall, slotZ(section.firstSlot), LABEL_Y);
+  //   scene.add(label);
+  // }
 
   buildContactWall(scene);
 
