@@ -59,10 +59,10 @@ export function buildRoom(scene: THREE.Scene): void {
   scene.add(backWall);
 
   // Museum daylight: soft hemisphere fill + one directional for frame modeling.
-  const hemi = new THREE.HemisphereLight(0xffffff, 0xb0aca4, 0.9);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0xb0aca4, 2.4);
   scene.add(hemi);
 
-  const dir = new THREE.DirectionalLight(0xffffff, 0.6);
+  const dir = new THREE.DirectionalLight(0xffffff, 1.2);
   dir.position.set(2, 6, 2);
   scene.add(dir);
 }

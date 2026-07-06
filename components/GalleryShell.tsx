@@ -20,21 +20,11 @@ export default function GalleryShell() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
   const experienceRef = useRef<GalleryExperience | null>(null);
-  const [webgl, setWebgl] = useState<boolean | null>(null);
+  const [fallback, setFallback] = useState(false);
   const [selected, setSelected] = useState<Artwork | null>(null);
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    if (!supportsWebGL2()) {
-      setWebgl(false);
-      return;
-    }
-    setWebgl(true);
-  }, []);
-
-  useEffect(() => {
-    if (!webgl || !canvasRef.current || !spacerRef.current) return;
-
     let disposed = false;
     let experience: GalleryExperience | null = null;
 
@@ -42,6 +32,10 @@ export default function GalleryShell() {
     // from any server-side evaluation.
     import("@/lib/gallery/experience").then(({ createGalleryExperience }) => {
       if (disposed || !canvasRef.current || !spacerRef.current) return;
+      if (!supportsWebGL2()) {
+        setFallback(true);
+        return;
+      }
       experience = createGalleryExperience(
         canvasRef.current,
         spacerRef.current,
@@ -58,9 +52,9 @@ export default function GalleryShell() {
       experience?.dispose();
       experienceRef.current = null;
     };
-  }, [webgl]);
+  }, []);
 
-  if (webgl === false) {
+  if (fallback) {
     return <FallbackGallery />;
   }
 
