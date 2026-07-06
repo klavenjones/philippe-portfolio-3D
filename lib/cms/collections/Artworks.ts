@@ -81,8 +81,11 @@ export const Artworks: CollectionConfig = {
         !value || HEX_COLOR.test(value) || "Use a hex color like #3d2b1f",
       admin: {
         position: "sidebar",
+        components: {
+          Field: "/lib/cms/components/ColorPickerField#ColorPickerField",
+        },
         description:
-          "Hex color for this piece's frame, e.g. #3d2b1f. Leave empty for the default (black for drawings, walnut for paintings).",
+          "Pick a frame color for this piece. Leave on default for black (drawings) or walnut (paintings).",
       },
     },
     {
