@@ -6,6 +6,8 @@ export interface Artwork {
   title: string;
   year: number;
   medium: string;
+  /** Physical canvas/paper dimensions, e.g. "12 × 16 in" — undefined if not listed. */
+  dimensions?: string;
   category: Category;
   /** Source image pixel dimensions [w, h] */
   px: [number, number];
@@ -43,6 +45,7 @@ export const ARTWORKS: Artwork[] = [
     year: 2013,
     medium: "Oil on canvas",
     category: "intro",
+    // Dimensions not listed on the original site.
     px: [480, 480],
     size: [1.2, 1.2],
     wall: "left",
@@ -53,7 +56,8 @@ export const ARTWORKS: Artwork[] = [
     src: "/images/oils/Papa_m_koupe_fre_m_2012.jpg",
     title: "Papa m koupe fre m",
     year: 2012,
-    medium: "Oil on canvas",
+    medium: "Oil on wood",
+    dimensions: "12 × 16 in",
     category: "oils",
     px: [362, 480],
     size: [1.06, 1.4],
@@ -65,7 +69,8 @@ export const ARTWORKS: Artwork[] = [
     src: "/images/food_and_shoes/Flaming_Hot_Cheetos_and_Red_Soda_2013.jpg",
     title: "Flaming Hot Cheetos and Red Soda",
     year: 2013,
-    medium: "Oil on canvas",
+    medium: "Acrylic",
+    dimensions: "6 × 6 in",
     category: "food-and-shoes",
     px: [480, 480],
     size: [1.3, 1.3],
@@ -90,6 +95,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Artist Mask",
     year: 2008,
     medium: "Graphite on paper",
+    dimensions: "9 × 12 in",
     category: "drawings",
     px: [358, 480],
     size: [0.9, 1.2],
@@ -102,6 +108,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Basquiat Study",
     year: 2009,
     medium: "Graphite on paper",
+    dimensions: "5 × 7 in",
     category: "drawings",
     px: [316, 480],
     size: [0.79, 1.2],
@@ -114,6 +121,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Sabrina",
     year: 2009,
     medium: "Graphite on paper",
+    dimensions: "8 × 8 in",
     category: "drawings",
     px: [490, 480],
     size: [1.2, 1.18],
@@ -126,6 +134,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Alex",
     year: 2010,
     medium: "Graphite on paper",
+    dimensions: "5 × 7 in",
     category: "drawings",
     px: [289, 480],
     size: [0.72, 1.2],
@@ -138,6 +147,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Family Portrait",
     year: 2010,
     medium: "Graphite on paper",
+    dimensions: "22 × 30 in",
     category: "drawings",
     px: [640, 381],
     size: [1.4, 0.83],
@@ -186,6 +196,7 @@ export const ARTWORKS: Artwork[] = [
     title: "Ray Mask",
     year: 2012,
     medium: "Graphite on paper",
+    dimensions: "9 × 12 in",
     category: "drawings",
     px: [280, 401],
     size: [0.84, 1.2],

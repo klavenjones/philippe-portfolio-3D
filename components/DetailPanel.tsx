@@ -51,6 +51,9 @@ export default function DetailPanel({
         </h2>
         <p className="mt-1 text-sm text-neutral-600">{artwork.year}</p>
         <p className="mt-4 text-sm italic text-neutral-500">{artwork.medium}</p>
+        {artwork.dimensions && (
+          <p className="mt-1 text-sm text-neutral-400">{artwork.dimensions}</p>
+        )}
       </aside>
     </div>
   );
