@@ -3,6 +3,9 @@ import { revalidateGallery, revalidateGalleryAfterDelete } from "../hooks/revali
 
 export const Media: CollectionConfig = {
   slug: "media",
+  access: {
+    read: () => true, // images are public — the gallery serves them to visitors
+  },
   upload: {
     mimeTypes: ["image/*"],
     // Local fallback when Vercel Blob is not configured (dev without token).

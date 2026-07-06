@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { ARTWORKS, BIO_TEXT, ARTIST_NAME, CONTACT_EMAIL, SECTIONS, type Artwork } from "./artworks";
-import { ART_CENTER_Y, COLORS, FRAME, HALL, LABEL_Y, WALL_X, slotZ } from "./constants";
+import type { Artwork, GalleryData, GallerySettings, GalleryLayout } from "./artworks";
+import { ART_CENTER_Y, COLORS, FRAME, WALL_X, slotZ } from "./constants";
 
 export interface GalleryFrames {
   /** Art-plane meshes for raycasting; userData.artworkId set on each. */
@@ -106,7 +106,7 @@ function buildFramedArtwork(
   return { group, artPlane };
 }
 
-function buildBioPanel(): THREE.Group {
+function buildBioPanel(settings: GallerySettings): THREE.Group {
   const widthM = 1.4;
   const heightM = 1.0;
   const tex = makeTextTexture({
@@ -118,10 +118,10 @@ function buildBioPanel(): THREE.Group {
       const pad = w * 0.07;
       ctx.fillStyle = "#1a1a1a";
       ctx.font = `600 ${w * 0.05}px Georgia, serif`;
-      ctx.fillText(ARTIST_NAME.toUpperCase(), pad, pad + w * 0.05);
+      ctx.fillText(settings.artistName.toUpperCase(), pad, pad + w * 0.05);
       ctx.font = `${w * 0.031}px Georgia, serif`;
       ctx.fillStyle = "#333333";
-      const lines = wrapText(ctx, BIO_TEXT, w - pad * 2);
+      const lines = wrapText(ctx, settings.bioText, w - pad * 2);
       const lineHeight = w * 0.047;
       lines.forEach((line, i) => {
         ctx.fillText(line, pad, pad + w * 0.12 + i * lineHeight);
@@ -138,33 +138,11 @@ function buildBioPanel(): THREE.Group {
   return group;
 }
 
-function buildSectionLabel(text: string): THREE.Group {
-  const widthM = 0.5;
-  const heightM = 0.25;
-  const tex = makeTextTexture({
-    widthM,
-    heightM,
-    draw: (ctx, w, h) => {
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = "#1a1a1a";
-      ctx.font = `600 ${w * 0.09}px Georgia, serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(text, w / 2, h / 2);
-    },
-  });
-  const group = new THREE.Group();
-  const label = new THREE.Mesh(
-    new THREE.PlaneGeometry(widthM, heightM),
-    new THREE.MeshBasicMaterial({ map: tex }),
-  );
-  label.position.z = 0.01;
-  group.add(label);
-  return group;
-}
-
-function buildContactWall(scene: THREE.Scene): void {
+function buildContactWall(
+  scene: THREE.Scene,
+  settings: GallerySettings,
+  layout: GalleryLayout,
+): void {
   const widthM = 3.2;
   const heightM = 1.6;
   const tex = makeTextTexture({
@@ -179,34 +157,38 @@ function buildContactWall(scene: THREE.Scene): void {
       ctx.fillText("GET IN TOUCH", w / 2, h * 0.38);
       ctx.font = `${w * 0.032}px Georgia, serif`;
       ctx.fillStyle = "#444444";
-      ctx.fillText(ARTIST_NAME, w / 2, h * 0.55);
-      ctx.fillText(CONTACT_EMAIL, w / 2, h * 0.68);
+      ctx.fillText(settings.artistName, w / 2, h * 0.55);
+      ctx.fillText(settings.contactEmail, w / 2, h * 0.68);
     },
   });
   const panel = new THREE.Mesh(
     new THREE.PlaneGeometry(widthM, heightM),
     new THREE.MeshBasicMaterial({ map: tex }),
   );
-  panel.position.set(0, ART_CENTER_Y + 0.2, HALL.endZ + 0.02);
+  panel.position.set(0, ART_CENTER_Y + 0.2, layout.hallEndZ + 0.02);
   scene.add(panel);
 }
 
-/** Hangs all artworks, the bio panel, section labels, and the contact end wall. */
+/** Hangs all artworks, the bio panel, and the contact end wall from CMS data. */
 export function buildFrames(
   scene: THREE.Scene,
   renderer: THREE.WebGLRenderer,
+  data: GalleryData,
 ): GalleryFrames {
   const loader = new THREE.TextureLoader();
   const maxAnisotropy = renderer.capabilities.getMaxAnisotropy();
 
-  const frameMat = new THREE.MeshStandardMaterial({
-    color: COLORS.frame,
-    roughness: 0.6,
-  });
-  const drawingFrameMat = new THREE.MeshStandardMaterial({
-    color: COLORS.drawingFrame,
-    roughness: 0.6,
-  });
+  // One shared material per unique frame color.
+  const frameMats = new Map<string, THREE.MeshStandardMaterial>();
+  const frameMatFor = (hex: string) => {
+    let mat = frameMats.get(hex);
+    if (!mat) {
+      mat = new THREE.MeshStandardMaterial({ color: hex, roughness: 0.6 });
+      frameMats.set(hex, mat);
+    }
+    return mat;
+  };
+
   const matMat = new THREE.MeshStandardMaterial({
     color: COLORS.mat,
     roughness: 0.9,
@@ -215,11 +197,11 @@ export function buildFrames(
   const clickTargets: THREE.Mesh[] = [];
   const groups = new Map<string, THREE.Group>();
 
-  for (const artwork of ARTWORKS) {
+  for (const artwork of data.artworks) {
     const { group, artPlane } = buildFramedArtwork(
       artwork,
       loader,
-      artwork.category === "drawings" ? drawingFrameMat : frameMat,
+      frameMatFor(artwork.frameColor),
       matMat,
       maxAnisotropy,
     );
@@ -228,19 +210,15 @@ export function buildFrames(
     groups.set(artwork.id, group);
   }
 
-  // Bio panel: same wall as the self-portrait, 1.8m further down the hall.
-  const bio = buildBioPanel();
-  placeOnWall(bio, "left", slotZ(0) - 1.8);
-  scene.add(bio);
+  // Bio panel: same wall as the first artwork (self-portrait), 1.8m further down.
+  if (data.artworks.length > 0 && data.settings.bioText) {
+    const first = data.artworks[0];
+    const bio = buildBioPanel(data.settings);
+    placeOnWall(bio, first.wall, slotZ(first.slot) - 1.8);
+    scene.add(bio);
+  }
 
-  // for (const section of SECTIONS) {
-  //   const artwork = ARTWORKS.find((a) => a.slot === section.firstSlot)!;
-  //   const label = buildSectionLabel(section.label);
-  //   placeOnWall(label, artwork.wall, slotZ(section.firstSlot), LABEL_Y);
-  //   scene.add(label);
-  // }
-
-  buildContactWall(scene);
+  buildContactWall(scene, data.settings, data.layout);
 
   return { clickTargets, groups };
 }

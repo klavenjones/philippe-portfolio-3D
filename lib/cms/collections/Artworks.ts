@@ -5,6 +5,9 @@ const HEX_COLOR = /^#[0-9a-fA-F]{6}$/;
 
 export const Artworks: CollectionConfig = {
   slug: "artworks",
+  access: {
+    read: () => true, // artwork metadata is public site content
+  },
   orderable: true,
   defaultSort: "_order",
   admin: {

@@ -1,11 +1,13 @@
 "use client";
 
-import { ARTIST_NAME, CONTACT_EMAIL } from "@/lib/gallery/artworks";
-
 export default function OverlayUI({
+  artistName,
+  contactEmail,
   progress,
   detailOpen,
 }: {
+  artistName: string;
+  contactEmail: string;
   progress: number;
   detailOpen: boolean;
 }) {
@@ -27,7 +29,7 @@ export default function OverlayUI({
       {/* Artist name */}
       <header className="absolute left-6 top-5">
         <h1 className="font-serif text-sm uppercase tracking-[0.3em] text-neutral-800">
-          {ARTIST_NAME}
+          {artistName}
         </h1>
       </header>
 
@@ -50,7 +52,7 @@ export default function OverlayUI({
         }`}
       >
         <a
-          href={`mailto:${CONTACT_EMAIL}`}
+          href={`mailto:${contactEmail}`}
           className="pointer-events-auto rounded-full border border-neutral-800 px-6 py-2 text-xs uppercase tracking-[0.25em] text-neutral-800 transition-colors hover:bg-neutral-900 hover:text-white"
         >
           Get in touch

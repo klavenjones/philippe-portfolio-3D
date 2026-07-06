@@ -15,7 +15,35 @@ export interface Artwork {
   size: [number, number];
   wall: "left" | "right";
   slot: number;
+  /** Frame hex color, e.g. "#3d2b1f". */
+  frameColor: string;
 }
+
+export interface GallerySettings {
+  artistName: string;
+  bioText: string;
+  contactEmail: string;
+}
+
+/** Scene measurements derived from the artwork count (meters / vh). */
+export interface GalleryLayout {
+  slotCount: number;
+  hallEndZ: number;
+  cameraEndZ: number;
+  spacerVh: number;
+}
+
+export interface GalleryData {
+  artworks: Artwork[];
+  settings: GallerySettings;
+  layout: GalleryLayout;
+}
+
+// ---------------------------------------------------------------------------
+// Legacy hardcoded content below — used ONLY by scripts/seed.ts to migrate
+// into the CMS. The live site reads from Payload via lib/cms/getGalleryData.
+// Delete once the CMS is seeded and verified.
+// ---------------------------------------------------------------------------
 
 export const ARTIST_NAME = "Philippe Previl";
 
@@ -34,7 +62,7 @@ export const CATEGORY_LABELS: Record<Category, string> = {
   drawings: "Drawings & Sketches",
 };
 
-export const ARTWORKS: Artwork[] = [
+export const LEGACY_ARTWORKS: Omit<Artwork, "frameColor">[] = [
   {
     id: "self-portrait",
     src: "/images/splash.jpg",
@@ -202,12 +230,3 @@ export const ARTWORKS: Artwork[] = [
   },
 ];
 
-/** Sections that get an in-world wall label above their first artwork. */
-export const SECTIONS: { category: Category; label: string; firstSlot: number }[] = [
-  { category: "oils", label: "Oils", firstSlot: 1 },
-  { category: "food-and-shoes", label: "Food & Shoes", firstSlot: 2 },
-  { category: "drawings", label: "Drawings & Sketches", firstSlot: 3 },
-];
-
-export const artworkById = (id: string): Artwork | undefined =>
-  ARTWORKS.find((a) => a.id === id);

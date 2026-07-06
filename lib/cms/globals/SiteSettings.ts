@@ -4,6 +4,9 @@ import { revalidateGallery } from "../hooks/revalidateGallery";
 export const SiteSettings: GlobalConfig = {
   slug: "site-settings",
   label: "Site Settings",
+  access: {
+    read: () => true, // bio/contact are public site content
+  },
   admin: {
     description: "Your name, bio, and contact info shown in the gallery.",
   },

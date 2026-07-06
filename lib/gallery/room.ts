@@ -1,10 +1,11 @@
 import * as THREE from "three";
+import type { GalleryLayout } from "./artworks";
 import { COLORS, HALL } from "./constants";
 
 /** Builds the gallery hall: floor, walls, ceiling, and lighting. */
-export function buildRoom(scene: THREE.Scene): void {
-  const length = HALL.startZ - HALL.endZ; // 82
-  const centerZ = (HALL.startZ + HALL.endZ) / 2; // -37
+export function buildRoom(scene: THREE.Scene, layout: GalleryLayout): void {
+  const length = HALL.startZ - layout.hallEndZ;
+  const centerZ = (HALL.startZ + layout.hallEndZ) / 2;
 
   const wallMat = new THREE.MeshStandardMaterial({
     color: COLORS.wall,
@@ -50,7 +51,7 @@ export function buildRoom(scene: THREE.Scene): void {
   const endWallGeo = new THREE.PlaneGeometry(HALL.width, HALL.height);
 
   const endWall = new THREE.Mesh(endWallGeo, wallMat);
-  endWall.position.set(0, HALL.height / 2, HALL.endZ);
+  endWall.position.set(0, HALL.height / 2, layout.hallEndZ);
   scene.add(endWall);
 
   const backWall = new THREE.Mesh(endWallGeo, wallMat);

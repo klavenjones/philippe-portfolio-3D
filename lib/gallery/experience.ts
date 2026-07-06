@@ -1,5 +1,5 @@
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import type { Artwork } from "./artworks";
+import type { Artwork, GalleryData } from "./artworks";
 import { createSceneCore } from "./scene";
 import { buildRoom } from "./room";
 import { buildFrames } from "./frames";
@@ -18,25 +18,30 @@ export interface GalleryExperience {
 
 /**
  * The only entry point React talks to. Owns the whole Three.js world:
- * scene, scroll-driven camera, and click interactions.
+ * scene, scroll-driven camera, and click interactions. Content and layout
+ * come from the CMS via `data`.
  */
 export function createGalleryExperience(
   canvas: HTMLCanvasElement,
   spacer: HTMLElement,
   callbacks: ExperienceCallbacks,
+  data: GalleryData,
 ): GalleryExperience {
-  const core = createSceneCore(canvas);
-  buildRoom(core.scene);
-  const frames = buildFrames(core.scene, core.renderer);
+  const core = createSceneCore(canvas, data.layout);
+  buildRoom(core.scene, data.layout);
+  const frames = buildFrames(core.scene, core.renderer, data);
 
   const scroll = createScrollCamera({
     spacer,
+    artworks: data.artworks,
+    layout: data.layout,
     onProgress: callbacks.onProgress,
   });
 
   const interactions = createInteractions({
     canvas,
     camera: core.camera,
+    artworks: data.artworks,
     clickTargets: frames.clickTargets,
     camPos: scroll.camPos,
     target: scroll.target,

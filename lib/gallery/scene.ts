@@ -1,5 +1,6 @@
 import * as THREE from "three";
-import { CAMERA, COLORS } from "./constants";
+import type { GalleryLayout } from "./artworks";
+import { CAMERA, COLORS, HALL } from "./constants";
 
 export interface SceneCore {
   renderer: THREE.WebGLRenderer;
@@ -12,7 +13,10 @@ export interface SceneCore {
 const maxDPR = () =>
   window.matchMedia("(pointer: coarse)").matches ? 1.5 : 2;
 
-export function createSceneCore(canvas: HTMLCanvasElement): SceneCore {
+export function createSceneCore(
+  canvas: HTMLCanvasElement,
+  layout: GalleryLayout,
+): SceneCore {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
@@ -21,15 +25,17 @@ export function createSceneCore(canvas: HTMLCanvasElement): SceneCore {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, maxDPR()));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+  const hallLength = HALL.startZ - layout.hallEndZ;
+
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(COLORS.fog);
-  scene.fog = new THREE.Fog(COLORS.fog, 30, 90);
+  scene.fog = new THREE.Fog(COLORS.fog, 30, hallLength + 12);
 
   const camera = new THREE.PerspectiveCamera(
     CAMERA.fov,
     1,
     CAMERA.near,
-    CAMERA.far,
+    hallLength + 40,
   );
   camera.position.set(0, CAMERA.height, CAMERA.startZ);
 

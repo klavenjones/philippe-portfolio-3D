@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ARTWORKS } from "./artworks";
-import { ART_CENTER_Y, CAMERA, HALL, WALL_X, slotZ } from "./constants";
+import type { Artwork, GalleryLayout } from "./artworks";
+import { ART_CENTER_Y, CAMERA, WALL_X, slotZ } from "./constants";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -17,23 +17,34 @@ export interface ScrollCamera {
   dispose: () => void;
 }
 
-// Timeline time is measured in meters of camera travel: camZ(t) = startZ - t.
-const TRAVEL = CAMERA.startZ - CAMERA.endZ; // 78
-const timeAtZ = (z: number) => CAMERA.startZ - z;
-
 /** World position of an artwork's center. */
 const artworkTarget = (slot: number, wall: "left" | "right") =>
   new THREE.Vector3(wall === "left" ? -WALL_X : WALL_X, ART_CENTER_Y, slotZ(slot));
 
 export function createScrollCamera(opts: {
   spacer: HTMLElement;
+  artworks: Artwork[];
+  layout: GalleryLayout;
   onProgress?: (progress: number) => void;
 }): ScrollCamera {
+  const { artworks, layout } = opts;
+
+  // Timeline time is measured in meters of camera travel: camZ(t) = startZ - t.
+  const travel = CAMERA.startZ - layout.cameraEndZ;
+  const timeAtZ = (z: number) => CAMERA.startZ - z;
+
   const camPos = new THREE.Vector3(0, CAMERA.height, CAMERA.startZ);
 
-  // Slot 0 (self-portrait + bio) anchors the opening view; aim between the two.
-  const introTarget = new THREE.Vector3(-WALL_X, ART_CENTER_Y, -0.9);
-  const target = introTarget.clone();
+  // The first artwork (self-portrait + bio) anchors the opening view; aim
+  // between the piece and the bio panel hung 1.8m further down.
+  const first = artworks[0];
+  const target = first
+    ? new THREE.Vector3(
+        first.wall === "left" ? -WALL_X : WALL_X,
+        ART_CENTER_Y,
+        slotZ(first.slot) - 0.9,
+      )
+    : new THREE.Vector3(0, ART_CENTER_Y, layout.hallEndZ);
 
   const reducedMotion = window.matchMedia(
     "(prefers-reduced-motion: reduce)",
@@ -52,15 +63,15 @@ export function createScrollCamera(opts: {
   });
 
   // Constant walking speed down the centerline; scrub smoothing supplies the glide.
-  tl.to(camPos, { z: CAMERA.endZ, duration: TRAVEL }, 0);
+  tl.to(camPos, { z: layout.cameraEndZ, duration: travel }, 0);
 
   // Look-at choreography: start turning ~4m before each piece, arrive 1.5m out,
   // hold while walking past, then turn toward the next.
   const TURN_LEAD = 4;
   const TURN_ARRIVE = 1.5;
 
-  // Slot 0 is already the initial target; choreograph slots 1+ and the end wall.
-  for (const artwork of ARTWORKS.slice(1)) {
+  // The first artwork is already the initial target; choreograph the rest.
+  for (const artwork of artworks.slice(1)) {
     const t = timeAtZ(slotZ(artwork.slot));
     const to = artworkTarget(artwork.slot, artwork.wall);
     tl.to(
@@ -73,8 +84,8 @@ export function createScrollCamera(opts: {
   // Final stretch: face the "Get in touch" end wall.
   tl.to(
     target,
-    { x: 0, y: ART_CENTER_Y + 0.2, z: HALL.endZ, duration: 4 },
-    TRAVEL - 10,
+    { x: 0, y: ART_CENTER_Y + 0.2, z: layout.hallEndZ, duration: 4 },
+    travel - 10,
   );
 
   return {

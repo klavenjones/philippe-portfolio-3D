@@ -1,8 +1,8 @@
 import * as THREE from "three";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { artworkById, type Artwork } from "./artworks";
-import { DETAIL_VIEW, WALL_X } from "./constants";
+import type { Artwork } from "./artworks";
+import { ART_CENTER_Y, DETAIL_VIEW, WALL_X, slotZ } from "./constants";
 
 type ViewState = "idle" | "focusing" | "detail" | "returning";
 
@@ -15,6 +15,7 @@ export interface Interactions {
 export function createInteractions(opts: {
   canvas: HTMLCanvasElement;
   camera: THREE.PerspectiveCamera;
+  artworks: Artwork[];
   clickTargets: THREE.Mesh[];
   camPos: THREE.Vector3;
   target: THREE.Vector3;
@@ -22,6 +23,7 @@ export function createInteractions(opts: {
   onArtworkSelected: (artwork: Artwork | null) => void;
 }): Interactions {
   const { canvas, camera, clickTargets, camPos, target, scrollTrigger } = opts;
+  const artworkById = new Map(opts.artworks.map((a) => [a.id, a]));
 
   let state: ViewState = "idle";
   let savedScrollY = 0;
@@ -42,7 +44,7 @@ export function createInteractions(opts: {
     raycaster.setFromCamera(pointer, camera);
     const hit = raycaster.intersectObjects(clickTargets, false)[0];
     if (!hit) return null;
-    return artworkById(hit.object.userData.artworkId as string) ?? null;
+    return artworkById.get(hit.object.userData.artworkId as string) ?? null;
   };
 
   const killTweens = () => {
@@ -61,7 +63,7 @@ export function createInteractions(opts: {
 
     const wallSign = artwork.wall === "left" ? -1 : 1;
     const artX = wallSign * WALL_X;
-    const artCenter = new THREE.Vector3(artX, 1.6, -artwork.slot * 5);
+    const artCenter = new THREE.Vector3(artX, ART_CENTER_Y, slotZ(artwork.slot));
     // Step back along the wall normal, far enough that the small source
     // textures stay acceptably sharp.
     const distance = Math.max(DETAIL_VIEW.distance, DETAIL_VIEW.minDistance);

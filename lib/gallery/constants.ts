@@ -1,24 +1,22 @@
 // All scene measurements in meters.
 
+// Hall end / camera end / scroll length are computed from the artwork count —
+// see GalleryLayout (lib/gallery/artworks.ts) and computeLayout (lib/cms/mapArtworks.ts).
 export const HALL = {
   width: 6, // walls at x = ±3
   height: 4,
   startZ: 4,
-  endZ: -78, // end wall
 } as const;
 
 export const WALL_X = HALL.width / 2;
 
 export const SLOT_SPACING = 5;
-export const SLOT_COUNT = 15;
 
 export const CAMERA = {
   height: 1.6,
   fov: 55,
   near: 0.1,
-  far: 120,
   startZ: 4,
-  endZ: -74,
 } as const;
 
 export const ART_CENTER_Y = 1.6;
@@ -37,8 +35,6 @@ export const DETAIL_VIEW = {
   focusDuration: 1.0,
   returnDuration: 0.8,
 } as const;
-
-export const SCROLL_SPACER_VH = 1500;
 
 export const COLORS = {
   wall: 0xf4f2ee,

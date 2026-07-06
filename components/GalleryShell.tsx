@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Artwork } from "@/lib/gallery/artworks";
-import { SCROLL_SPACER_VH } from "@/lib/gallery/constants";
+import type { Artwork, GalleryData } from "@/lib/gallery/artworks";
 import type { GalleryExperience } from "@/lib/gallery/experience";
 import DetailPanel from "./DetailPanel";
 import FallbackGallery from "./FallbackGallery";
@@ -16,7 +15,7 @@ const supportsWebGL2 = () => {
   }
 };
 
-export default function GalleryShell() {
+export default function GalleryShell({ data }: { data: GalleryData }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
   const experienceRef = useRef<GalleryExperience | null>(null);
@@ -43,6 +42,7 @@ export default function GalleryShell() {
           onArtworkSelected: setSelected,
           onProgress: setProgress,
         },
+        data,
       );
       experienceRef.current = experience;
     });
@@ -52,10 +52,10 @@ export default function GalleryShell() {
       experience?.dispose();
       experienceRef.current = null;
     };
-  }, []);
+  }, [data]);
 
   if (fallback) {
-    return <FallbackGallery />;
+    return <FallbackGallery artworks={data.artworks} settings={data.settings} />;
   }
 
   return (
@@ -68,15 +68,24 @@ export default function GalleryShell() {
           style={{ touchAction: "pan-y" }}
         />
       </div>
-      <div ref={spacerRef} aria-hidden style={{ height: `${SCROLL_SPACER_VH}vh` }} />
-      <OverlayUI progress={progress} detailOpen={selected !== null} />
+      <div
+        ref={spacerRef}
+        aria-hidden
+        style={{ height: `${data.layout.spacerVh}vh` }}
+      />
+      <OverlayUI
+        artistName={data.settings.artistName}
+        contactEmail={data.settings.contactEmail}
+        progress={progress}
+        detailOpen={selected !== null}
+      />
       <DetailPanel
         artwork={selected}
         onClose={() => experienceRef.current?.closeDetail()}
       />
       {/* Screen-reader accessible version of the gallery */}
       <div className="sr-only">
-        <FallbackGallery />
+        <FallbackGallery artworks={data.artworks} settings={data.settings} />
       </div>
     </>
   );
