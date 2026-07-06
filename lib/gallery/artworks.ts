@@ -23,12 +23,9 @@ export const ARTIST_NAME = "Philippe Previl";
 export const CONTACT_EMAIL = "contact@philippeprevil.com";
 
 export const BIO_TEXT =
-  "Philippe Previl is a painter and draftsman whose work centers on the human face — " +
-  "family, friends, and self, rendered in oil and graphite with unguarded directness. " +
-  "Drawing on his Haitian heritage and everyday American life, his portraits and still " +
-  "lifes find weight in the familiar: a father's words, a bag of Flaming Hot Cheetos, " +
-  "the people closest to him. Each piece is less a likeness than a record of attention — " +
-  "time spent looking at what, and who, matters.";
+  "Philippe is an experienced Graphic Artist with a demonstrated history of working in the " +
+  "food & beverages industry. Strong arts and design professional skilled in Photography, " +
+  "Printmaking, Graphics, Painting, and Murals.";
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   intro: "About the Artist",
