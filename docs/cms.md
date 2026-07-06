@@ -68,7 +68,8 @@ Keep `lib/gallery/artworks.ts`'s `LEGACY_ARTWORKS` and `public/images/` until th
 
 1. Create a Neon Postgres database and a Vercel Blob store; set the three env vars in Vercel (all environments — `DATABASE_URL` is needed at build time because the page prerenders).
 2. Before the first deploy, create the initial migration: `pnpm payload migrate:create initial`, and set the Vercel build command to `pnpm payload migrate && pnpm build` (the `ci` script).
-3. Deploy, then visit `/admin` to create the artist's login, and run the seed against production: `DATABASE_URL=<neon-url> BLOB_READ_WRITE_TOKEN=<token> pnpm seed`.
+3. Deploy, then visit `/admin` to create the artist's login, and run the seed against production: `NODE_ENV=production DATABASE_URL=<neon-url> BLOB_READ_WRITE_TOKEN=<token> pnpm seed`. **`NODE_ENV=production` matters**: without it, Payload treats the database as dev-push-managed (adds a `dev` row to `payload_migrations`), which makes the next `payload migrate` in CI hang on an interactive prompt. If that ever happens, delete the row: `delete from payload_migrations where name = 'dev';`.
+4. The Vercel Blob store must be created with **public** access — the Payload adapter and the Three.js texture loader both require public URLs. Access is set at store creation and can't be changed after.
 4. Verify an edit in `/admin` shows up on the site within a minute.
 
 Note: dev mode uses drizzle schema push (no migration files); production uses committed migrations from `payload migrate:create`.
